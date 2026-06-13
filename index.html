@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>最速ルートシミュレーター (代々木発)</title>
+    <title>鉄緑会 最速帰宅シュミレーター</title>
     <style>
         :root {
-            --primary: #1e3a8a;
-            --primary-light: #eff6ff;
-            --accent: #10b981;
-            --accent-dark: #047857;
+            /* 赤と黒を基調とした洗練されたカラーパレット */
+            --brand-red: #a80015;       /* 深みと品格のある赤 */
+            --brand-red-light: #fdf2f4; /* ほんのり赤みを帯びた淡い背景色 */
+            --brand-black: #111111;     /* 漆黒 */
+            --brand-charcoal: #1e1e1e;  /* 炭黒（カード背景など） */
             --yamanote: #80c241;
-            --text-main: #1f2937;
-            --text-muted: #4b5563;
-            --bg-body: #f8fafc;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --bg-body: #f9f9f9;
             --bg-card: #ffffff;
-            --border: #e2e8f0;
+            --border: #e0e0e0;
         }
 
         * {
@@ -40,98 +41,132 @@
         header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px 0;
-            border-bottom: 3px solid var(--primary);
+            padding: 32px 20px;
+            background: var(--brand-black);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 4px solid var(--brand-red);
         }
 
         header h1 {
-            font-size: 24px;
-            color: var(--primary);
-            margin-bottom: 5px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            letter-spacing: 0.03em;
+        }
+
+        /* 「鉄緑会」をシンプルかつ美しく強調 */
+        header h1 .tetsuryoku-brand {
+            color: var(--brand-red);
+            font-weight: 900;
+            margin-right: 8px;
         }
 
         header p {
-            font-size: 14px;
-            color: var(--text-muted);
+            font-size: 13px;
+            color: #b3b3b3;
+            font-weight: 400;
         }
 
         .config-card {
             background: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             margin-bottom: 24px;
             border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .config-card::before {
+            content: "【鉄緑会 代々木校舎専用】";
+            position: absolute;
+            top: -11px;
+            left: 20px;
+            background: var(--brand-charcoal);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 1px 10px;
+            border-radius: 3px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 12px;
+            margin-bottom: 20px;
+            margin-top: 5px;
         }
 
         label {
-            font-weight: bold;
+            font-weight: 700;
             font-size: 14px;
-            color: var(--text-main);
+            color: var(--brand-black);
         }
 
         .input-row {
             display: flex;
             gap: 12px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         input[type="time"] {
-            padding: 10px 16px;
+            padding: 10px 14px;
             font-size: 16px;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
             flex: 1;
-            max-width: 200px;
+            max-width: 180px;
+            font-weight: 700;
+            color: var(--brand-black);
+            text-align: center;
         }
 
         input[type="time"]:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+            border-color: var(--brand-red);
+            box-shadow: 0 0 0 3px rgba(168, 0, 21, 0.1);
         }
 
         .btn-preset {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            border: 1px solid rgba(30, 58, 138, 0.2);
-            padding: 10px 16px;
-            font-size: 14px;
-            border-radius: 6px;
+            background-color: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            font-size: 13px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.2s;
         }
 
         .btn-preset:hover {
-            background-color: var(--primary);
-            color: white;
+            background-color: var(--brand-red-light);
+            border-color: var(--brand-red);
+            color: var(--brand-red);
         }
 
         .btn-submit {
-            background-color: var(--primary);
+            background: var(--brand-red);
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
             transition: background-color 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.03em;
         }
 
         .btn-submit:hover {
-            background-color: #1d4ed8;
+            background-color: #8c0011;
         }
 
         .results-section {
@@ -139,9 +174,10 @@
         }
 
         .section-title {
-            font-size: 18px;
-            color: var(--text-main);
-            margin-bottom: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--brand-black);
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -151,60 +187,47 @@
             content: "";
             display: inline-block;
             width: 4px;
-            height: 18px;
-            background-color: var(--primary);
-            border-radius: 2px;
+            height: 16px;
+            background-color: var(--brand-red);
         }
 
-        /* 最速ルートのハイライト表示 */
+        /* 最速ルートカード */
         .best-route-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-            border: 2px solid var(--accent);
-            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--brand-red);
+            border-top: 4px solid var(--brand-red);
+            border-radius: 8px;
             padding: 24px;
             margin-bottom: 24px;
-            position: relative;
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
-        }
-
-        .badge-best {
-            position: absolute;
-            top: -12px;
-            left: 24px;
-            background-color: var(--accent);
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 4px 12px;
-            border-radius: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(168, 0, 21, 0.05);
         }
 
         .route-header {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            border-bottom: 1px dashed var(--border);
+            border-bottom: 1px solid var(--border);
             padding-bottom: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .route-summary {
             font-size: 15px;
-            font-weight: bold;
+            font-weight: 700;
+            color: var(--brand-black);
         }
 
         .route-time-large {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--accent-dark);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--brand-red);
         }
 
         /* タイムラインUI */
         .timeline {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 20px;
             position: relative;
             padding-left: 20px;
         }
@@ -213,9 +236,9 @@
             content: "";
             position: absolute;
             left: 4px;
-            top: 8px;
-            bottom: 8px;
-            width: 2px;
+            top: 6px;
+            bottom: 6px;
+            width: 1px;
             background-color: var(--border);
         }
 
@@ -231,8 +254,8 @@
             position: absolute;
             left: -20px;
             top: 6px;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background-color: var(--border);
             border: 2px solid white;
@@ -243,11 +266,11 @@
         }
 
         .timeline-item.bus::before {
-            background-color: var(--primary);
+            background-color: var(--brand-red);
         }
 
         .timeline-item.goal::before {
-            background-color: var(--accent);
+            background-color: var(--brand-black);
             transform: scale(1.2);
         }
 
@@ -257,7 +280,8 @@
         }
 
         .node-name {
-            font-weight: bold;
+            font-weight: 700;
+            color: var(--brand-black);
         }
 
         .node-transport {
@@ -267,17 +291,18 @@
         }
 
         .node-time {
-            font-weight: bold;
-            color: var(--text-main);
+            font-weight: 700;
+            color: var(--brand-black);
             font-variant-numeric: tabular-nums;
+            text-align: right;
         }
 
         /* ランキングテーブル */
         .table-container {
             background: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
             overflow-x: auto;
         }
 
@@ -289,15 +314,15 @@
         }
 
         th {
-            background-color: #f1f5f9;
-            color: var(--text-muted);
-            font-weight: 600;
+            background-color: #f5f5f5;
+            color: var(--brand-black);
+            font-weight: 700;
             padding: 12px 16px;
             border-bottom: 1px solid var(--border);
         }
 
         td {
-            padding: 14px 16px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             color: var(--text-main);
             font-variant-numeric: tabular-nums;
@@ -308,31 +333,33 @@
         }
 
         tr:nth-child(even) {
-            background-color: #f8fafc;
+            background-color: #fafafa;
         }
 
         .rank-badge {
             display: inline-block;
-            width: 24px;
-            height: 24px;
-            line-height: 24px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
             text-align: center;
-            border-radius: 50%;
+            border-radius: 2px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
+            background-color: #e0e0e0;
+            color: #666666;
         }
 
         tr:nth-child(1) .rank-badge {
-            background-color: #fef08a;
-            color: #854d0e;
+            background-color: var(--brand-red);
+            color: white;
         }
 
         .no-route-msg {
-            background-color: #fff7ed;
-            color: #c2410c;
+            background-color: #fff5f5;
+            color: var(--brand-red);
             padding: 16px;
-            border-radius: 8px;
-            border: 1px solid #fed7aa;
+            border-radius: 4px;
+            border: 1px solid #fdcbcb;
             text-align: center;
             font-weight: bold;
         }
@@ -356,37 +383,37 @@
 
 <div class="container">
     <header>
-        <h1>最速ルートシミュレーター</h1>
-        <p>代々木駅から各駅（渋谷・恵比寿・目黒）経由のバス乗り換え最適ルートを計算します</p>
+        <h1><span class="tetsuryoku-brand">鉄緑会</span> 最速帰宅シュミレーター</h1>
+        <p>鉄緑会 代々木校舎の退出時刻から、山手線（渋谷・恵比寿・目黒経由）を利用した最速のバス乗り換えルートを検索します</p>
     </header>
 
     <div class="config-card">
         <div class="form-group">
-            <label for="departure-time">代々木駅での出発準備完了時刻</label>
+            <label for="departure-time">鉄緑会 校舎退出時刻（または代々木駅ホーム到着予定時刻）</label>
             <div class="input-row">
                 <input type="time" id="departure-time" required>
-                <button type="button" class="btn-preset" id="btn-now-plus-4">現在時刻の4分後を設定</button>
+                <button type="button" class="btn-preset" id="btn-now-plus-4">現在時刻（即退出）</button>
             </div>
         </div>
-        <button type="button" class="btn-submit" onclick="onCalculate()">最適ルートを検索する</button>
+        <button type="button" class="btn-submit" onclick="onCalculate()">最速帰宅ルートを検索・解析する</button>
     </div>
 
     <div id="results-section" class="results-section">
-        <div class="section-title">おすすめの最速ルート</div>
+        <div class="section-title">最速帰宅ルート</div>
         <div id="best-route-container"></div>
 
-        <div class="section-title" style="margin-top: 32px;">ルート検索結果（上位5件）</div>
+        <div class="section-title" style="margin-top: 32px;">経由駅別ルート一覧（上位5件）</div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>順位</th>
+                        <th>選択順</th>
                         <th>経由駅</th>
-                        <th>路線</th>
+                        <th>バス系統</th>
                         <th>代々木発</th>
                         <th>バス発</th>
                         <th>自宅着</th>
-                        <th>総時間</th>
+                        <th>総所要時間</th>
                     </tr>
                 </thead>
                 <tbody id="ranking-table-body">
@@ -396,7 +423,7 @@
     </div>
     
     <div id="no-results-section" class="results-section">
-        <div class="no-route-msg">利用可能なルートがありませんでした。出発時刻を確認してください。</div>
+        <div class="no-route-msg">該当時間帯に接続可能なバス便がありません。退出予定時刻を再調整してください。</div>
     </div>
 </div>
 
@@ -451,7 +478,6 @@
 
     const baseDateStr = "2026-04-08 ";
 
-    // 初期化処理
     window.addEventListener('DOMContentLoaded', () => {
         setDefaultTime();
         document.getElementById('btn-now-plus-4').addEventListener('click', setDefaultTime);
@@ -459,7 +485,6 @@
 
     function setDefaultTime() {
         const now = new Date();
-        // 現在時刻に4分プラス
         now.setMinutes(now.getMinutes() + 4);
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -467,7 +492,6 @@
     }
 
     function parseDateTime(timeStr) {
-        // 00:xx などの深夜帯の暫定対応として、元のコードの仕様(同一日付のタイムスタンプ)に合わせる
         return new Date(baseDateStr + timeStr);
     }
 
@@ -482,23 +506,17 @@
         const departureDt = parseDateTime(departureStr);
         let results = [];
 
-        // 各経由駅のループ
         for (const [station, busInfo] of Object.entries(busTimetable)) {
             const trainMin = travelTime[station];
             
-            // 山手線の各時刻をループ
             for (const tStr of yamanoteTimes) {
                 const trainDt = parseDateTime(tStr);
                 
-                // 出発時刻より前の電車はスキップ
                 if (trainDt < departureDt) continue;
 
-                // 駅到着時刻
                 const arrivalDt = new Date(trainDt.getTime() + trainMin * 60000);
-                // 最低待ち時間を加味したバス乗車可能時刻
                 const minBusDt = new Date(arrivalDt.getTime() + busInfo["最低待ち時間"] * 60000);
 
-                // 乗車可能な最初のバスを探す
                 const nextBusStr = busInfo["times"].find(btStr => parseDateTime(btStr) >= minBusDt);
 
                 if (nextBusStr) {
@@ -519,13 +537,11 @@
             }
         }
 
-        // ソート（総所要時間、次いで自宅着時刻）
         results.sort((a, b) => {
             if (a.totalMin !== b.totalMin) return a.totalMin - b.totalMin;
             return a.homeArr.localeCompare(b.homeArr);
         });
 
-        // 描画処理
         renderResults(results);
     }
 
@@ -544,53 +560,50 @@
         noResultsSection.style.display = 'none';
         resultsSection.style.display = 'block';
 
-        // 1. 最速ルートのカード生成
         const best = results[0];
         bestContainer.innerHTML = `
             <div class="best-route-card">
-                <span class="badge-best">RECOMMEND / 最速</span>
                 <div class="route-header">
-                    <div class="route-summary">${best.station}経由 (${best.busRoute})</div>
-                    <div class="route-time-large">${best.totalMin}<span style="font-size:16px; font-weight:bold;">分</span></div>
+                    <div class="route-summary">${best.station}駅接続 ➔ [${best.busRoute}]系統</div>
+                    <div class="route-time-large">${best.totalMin}<span style="font-size:15px; font-weight:normal; color:var(--text-main);"> 分で自宅到着</span></div>
                 </div>
                 <div class="timeline">
                     <div class="timeline-item train">
                         <div class="node-info">
-                            <div class="node-name">代々木駅 出発</div>
-                            <div class="node-transport">JR山手線</div>
+                            <div class="node-name">鉄緑会 校舎退出 / 代々木駅 発</div>
+                            <div class="node-transport">JR山手線 外回り</div>
                         </div>
                         <div class="node-time">${best.trainDep}</div>
                     </div>
                     <div class="timeline-item bus">
                         <div class="node-info">
-                            <div class="node-name">${best.station}駅 着 / 乗り換え</div>
-                            <div class="node-transport">都営バス・東急バス (${best.busRoute})</div>
+                            <div class="node-name">${best.station}駅 到着 / 乗り換え</div>
+                            <div class="node-transport">バス乗車 [${best.busRoute}]</div>
                         </div>
-                        <div class="node-time">${best.stationArr}着<br><span style="font-size:11px; color:var(--text-muted);">(${best.busDep}発)</span></div>
+                        <div class="node-time">${best.stationArr}着<br><span style="font-size:11px; color:var(--text-muted); font-weight:normal;">(${best.busDep}発)</span></div>
                     </div>
                     <div class="timeline-item goal">
                         <div class="node-info">
                             <div class="node-name">自宅 到着</div>
                         </div>
-                        <div class="node-time">${best.homeArr}</div>
+                        <div class="node-time" style="color:var(--brand-red);">${best.homeArr}</div>
                     </div>
                 </div>
             </div>
         `;
 
-        // 2. 上位5件のテーブル生成
         tableBody.innerHTML = '';
         const displayResults = results.slice(0, 5);
         displayResults.forEach((r, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><span class="rank-badge">${idx + 1}</span></td>
-                <td style="font-weight:bold;">${r.station}</td>
-                <td><span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:12px;">${r.busRoute}</span></td>
+                <td style="font-weight:bold; color:var(--brand-black);">${r.station}</td>
+                <td><span style="background:#e0e0e0; padding:2px 8px; border-radius:3px; font-size:12px; font-weight:700;">${r.busRoute}</span></td>
                 <td>${r.trainDep}</td>
                 <td>${r.busDep}</td>
-                <td style="font-weight:bold; color:var(--primary);">${r.homeArr}</td>
-                <td style="font-weight:bold;">${r.totalMin}分</td>
+                <td style="font-weight:bold; color:var(--brand-red);">${r.homeArr}</td>
+                <td style="font-weight:bold; color:var(--brand-black);">${r.totalMin}分</td>
             `;
             tableBody.appendChild(tr);
         });
