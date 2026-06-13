@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最速ルートシミュレーター (代々木発)</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --accent: #10b981;
+            --accent-dark: #047857;
+            --yamanote: #80c241;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .config-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="time"] {
+            padding: 10px 16px;
+            font-size: 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        input[type="time"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        .btn-preset {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid rgba(30, 58, 138, 0.2);
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-submit:hover {
+            background-color: #1d4ed8;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* 最速ルートのハイライト表示 */
+        .best-route-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+        }
+
+        .badge-best {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background-color: var(--accent);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .route-summary {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .route-time-large {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-dark);
+        }
+
+        /* タイムラインUI */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background-color: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--border);
+            border: 2px solid white;
+        }
+
+        .timeline-item.train::before {
+            background-color: var(--yamanote);
+        }
+
+        .timeline-item.bus::before {
+            background-color: var(--primary);
+        }
+
+        .timeline-item.goal::before {
+            background-color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .node-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .node-name {
+            font-weight: bold;
+        }
+
+        .node-transport {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .node-time {
+            font-weight: bold;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ランキングテーブル */
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        tr:nth-child(1) .rank-badge {
+            background-color: #fef08a;
+            color: #854d0e;
+        }
+
+        .no-route-msg {
+            background-color: #fff7ed;
+            color: #c2410c;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #fed7aa;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            input[type="time"] {
+                max-width: none;
+            }
+            th, td {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>最速ルートシミュレーター</h1>
+        <p>代々木駅から各駅（渋谷・恵比寿・目黒）経由のバス乗り換え最適ルートを計算します</p>
+    </header>
+
+    <div class="config-card">
+        <div class="form-group">
+            <label for="departure-time">代々木駅での出発準備完了時刻</label>
+            <div class="input-row">
+                <input type="time" id="departure-time" required>
+                <button type="button" class="btn-preset" id="btn-now-plus-4">現在時刻の4分後を設定</button>
+            </div>
+        </div>
+        <button type="button" class="btn-submit" onclick="onCalculate()">最適ルートを検索する</button>
+    </div>
+
+    <div id="results-section" class="results-section">
+        <div class="section-title">おすすめの最速ルート</div>
+        <div id="best-route-container"></div>
+
+        <div class="section-title" style="margin-top: 32px;">ルート検索結果（上位5件）</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>順位</th>
+                        <th>経由駅</th>
+                        <th>路線</th>
+                        <th>代々木発</th>
+                        <th>バス発</th>
+                        <th>自宅着</th>
+                        <th>総時間</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="no-results-section" class="results-section">
+        <div class="no-route-msg">利用可能なルートがありませんでした。出発時刻を確認してください。</div>
+    </div>
+</div>
+
+<script>
+    // データ定義
+    const yamanoteTimes = [
+        "04:44","05:04","05:21","05:39","05:51",
+        "06:01","06:10","06:19","06:28","06:32","06:36","06:41","06:47","06:51","06:54","06:57",
+        "07:00","07:03","07:06","07:10","07:13","07:17","07:20","07:23","07:26","07:29",
+        "07:32","07:35","07:38","07:42","07:45","07:48","07:51","07:54","07:58",
+        "08:01","08:04","08:07","08:10","08:12","08:15","08:18","08:21","08:24",
+        "08:27","08:30","08:33","08:36","08:39","08:42","08:46","08:49","08:52","08:55","08:59",
+        "09:02","09:06","09:09","09:12","09:15","09:18","09:21","09:24","09:27",
+        "09:30","09:33","09:36","09:39","09:41","09:45","09:48","09:51","09:55","09:59",
+        "10:02","10:05","10:09","10:12","10:16","10:20","10:24","10:28",
+        "10:33","10:37","10:42","10:45","10:49","10:54","10:59",
+        "11:04","11:09","11:14","11:19","11:24","11:29","11:34","11:39","11:44","11:49","11:54","11:59",
+        "12:04","12:09","12:14","12:19","12:24","12:29","12:34","12:39","12:44","12:49","12:54","12:59",
+        "13:04","13:09","13:14","13:19","13:24","13:29","13:34","13:39","13:44","13:49","13:54","13:59",
+        "14:04","14:09","14:14","14:19","14:24","14:29","14:34","14:39","14:44","14:49","14:54","14:59",
+        "15:04","15:09","15:14","15:19","15:24","15:29","15:34","15:39","15:44","15:49","15:54","15:59",
+        "16:04","16:09","16:14","16:19","16:24","16:29","16:34","16:39","16:44","16:49","16:54","16:58",
+        "17:02","17:06","17:11","17:16","17:21","17:26","17:31","17:36","17:41","17:46","17:50","17:53","17:57",
+        "18:01","18:06","18:10","18:15","18:19","18:24","18:28","18:33","18:37","18:40","18:45","18:49","18:54","18:58",
+        "19:02","19:05","19:10","19:15","19:19","19:23","19:27","19:31","19:36","19:40","19:44","19:49","19:55","19:59",
+        "20:03","20:07","20:12","20:17","20:22","20:28","20:33","20:39","20:45","20:50","20:53","20:58",
+        "21:03","21:08","21:14","21:20","21:27","21:33","21:37","21:41","21:47","21:53","21:59",
+        "22:05","22:12","22:18","22:25","22:32","22:38","22:43","22:48","22:54",
+        "23:00","23:07","23:14","23:21","23:27","23:34","23:41","23:48","23:55",
+        "00:02","00:07","00:16","00:22","00:28","00:34","00:43"
+    ];
+
+    const travelTime = {"渋谷": 4, "恵比寿": 7, "目黒": 10};
+
+    const busTimetable = {
+        "目黒": {
+            "路線": "黒07",
+            "times": ["06:40","07:04","07:23","07:42","08:03","08:20","08:38","08:57","09:16","09:35","09:55","10:20","10:43","11:06","11:31","11:56","12:20","12:44","13:08","13:33","13:58","14:23","14:48","15:13","15:38","16:03","16:29","16:55","17:21","17:47","18:13","18:38","19:03","19:30","20:00","20:30","21:05","21:45","22:25"],
+            "所要時間": 25, "最低待ち時間": 5
+        },
+        "恵比寿": {
+            "路線": "恵32",
+            "times": ["06:42","06:55","07:08","07:21","07:33","07:45","07:57","08:10","08:23","08:36","08:49","09:01","09:13","09:25","09:37","09:49","10:01","10:13","10:25","10:37","10:49","11:01","11:14","11:27","11:40","11:55","12:10","12:25","12:40","12:55","13:10","13:25","13:40","13:55","14:10","14:25","14:40","14:54","15:08","15:22","15:36","15:50","16:04","16:16","16:28","16:40","16:52","17:04","17:16","17:28","17:40","17:52","18:04","18:16","18:28","18:40","18:52","19:04","19:16","19:28","19:40","19:52","20:04","20:16","20:28","20:40","20:52","21:05","21:20","21:35","21:50","22:10","22:32","22:55"],
+            "所要時間": 30, "最低待ち時間": 5
+        },
+        "渋谷": {
+            "路線": "渋11",
+            "times": ["06:35","06:47","06:59","07:11","07:23","07:35","07:47","07:59","08:14","08:29","08:44","08:59","09:14","09:29","09:44","10:29","11:14","11:59","12:44","13:29","14:01","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:20","19:40","20:00","20:20","20:40","21:00","21:20","21:40","22:00"],
+            "所要時間": 30, "最低待ち時間": 9
+        }
+    };
+
+    const baseDateStr = "2026-04-08 ";
+
+    // 初期化処理
+    window.addEventListener('DOMContentLoaded', () => {
+        setDefaultTime();
+        document.getElementById('btn-now-plus-4').addEventListener('click', setDefaultTime);
+    });
+
+    function setDefaultTime() {
+        const now = new Date();
+        // 現在時刻に4分プラス
+        now.setMinutes(now.getMinutes() + 4);
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('departure-time').value = `${hours}:${minutes}`;
+    }
+
+    function parseDateTime(timeStr) {
+        // 00:xx などの深夜帯の暫定対応として、元のコードの仕様(同一日付のタイムスタンプ)に合わせる
+        return new Date(baseDateStr + timeStr);
+    }
+
+    function formatTime(date) {
+        return String(date.getHours()).padStart(2, '0') + ":" + String(date.getMinutes()).padStart(2, '0');
+    }
+
+    function onCalculate() {
+        const departureStr = document.getElementById('departure-time').value;
+        if (!departureStr) return;
+
+        const departureDt = parseDateTime(departureStr);
+        let results = [];
+
+        // 各経由駅のループ
+        for (const [station, busInfo] of Object.entries(busTimetable)) {
+            const trainMin = travelTime[station];
+            
+            // 山手線の各時刻をループ
+            for (const tStr of yamanoteTimes) {
+                const trainDt = parseDateTime(tStr);
+                
+                // 出発時刻より前の電車はスキップ
+                if (trainDt < departureDt) continue;
+
+                // 駅到着時刻
+                const arrivalDt = new Date(trainDt.getTime() + trainMin * 60000);
+                // 最低待ち時間を加味したバス乗車可能時刻
+                const minBusDt = new Date(arrivalDt.getTime() + busInfo["最低待ち時間"] * 60000);
+
+                // 乗車可能な最初のバスを探す
+                const nextBusStr = busInfo["times"].find(btStr => parseDateTime(btStr) >= minBusDt);
+
+                if (nextBusStr) {
+                    const nextBusDt = parseDateTime(nextBusStr);
+                    const homeDt = new Date(nextBusDt.getTime() + busInfo["所要時間"] * 60000);
+                    const totalMin = Math.round((homeDt.getTime() - departureDt.getTime()) / 60000);
+
+                    results.push({
+                        station: station,
+                        busRoute: busInfo["路線"],
+                        trainDep: tStr,
+                        stationArr: formatTime(arrivalDt),
+                        busDep: nextBusStr,
+                        homeArr: formatTime(homeDt),
+                        totalMin: totalMin
+                    });
+                }
+            }
+        }
+
+        // ソート（総所要時間、次いで自宅着時刻）
+        results.sort((a, b) => {
+            if (a.totalMin !== b.totalMin) return a.totalMin - b.totalMin;
+            return a.homeArr.localeCompare(b.homeArr);
+        });
+
+        // 描画処理
+        renderResults(results);
+    }
+
+    function renderResults(results) {
+        const resultsSection = document.getElementById('results-section');
+        const noResultsSection = document.getElementById('no-results-section');
+        const bestContainer = document.getElementById('best-route-container');
+        const tableBody = document.getElementById('ranking-table-body');
+
+        if (results.length === 0) {
+            resultsSection.style.display = 'none';
+            noResultsSection.style.display = 'block';
+            return;
+        }
+
+        noResultsSection.style.display = 'none';
+        resultsSection.style.display = 'block';
+
+        // 1. 最速ルートのカード生成
+        const best = results[0];
+        bestContainer.innerHTML = `
+            <div class="best-route-card">
+                <span class="badge-best">RECOMMEND / 最速</span>
+                <div class="route-header">
+                    <div class="route-summary">${best.station}経由 (${best.busRoute})</div>
+                    <div class="route-time-large">${best.totalMin}<span style="font-size:16px; font-weight:bold;">分</span></div>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item train">
+                        <div class="node-info">
+                            <div class="node-name">代々木駅 出発</div>
+                            <div class="node-transport">JR山手線</div>
+                        </div>
+                        <div class="node-time">${best.trainDep}</div>
+                    </div>
+                    <div class="timeline-item bus">
+                        <div class="node-info">
+                            <div class="node-name">${best.station}駅 着 / 乗り換え</div>
+                            <div class="node-transport">都営バス・東急バス (${best.busRoute})</div>
+                        </div>
+                        <div class="node-time">${best.stationArr}着<br><span style="font-size:11px; color:var(--text-muted);">(${best.busDep}発)</span></div>
+                    </div>
+                    <div class="timeline-item goal">
+                        <div class="node-info">
+                            <div class="node-name">自宅 到着</div>
+                        </div>
+                        <div class="node-time">${best.homeArr}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 2. 上位5件のテーブル生成
+        tableBody.innerHTML = '';
+        const displayResults = results.slice(0, 5);
+        displayResults.forEach((r, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="rank-badge">${idx + 1}</span></td>
+                <td style="font-weight:bold;">${r.station}</td>
+                <td><span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:12px;">${r.busRoute}</span></td>
+                <td>${r.trainDep}</td>
+                <td>${r.busDep}</td>
+                <td style="font-weight:bold; color:var(--primary);">${r.homeArr}</td>
+                <td style="font-weight:bold;">${r.totalMin}分</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+</script>
+
+</body>
+</html>
